@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour
     float walkForce = 30.0f;
     float maxWalkSpeed = 2.0f;
 
+    int jumpCount = 0;  // 2단 점프를 위한 변수
+
     void Start()
     {
         this.rigid2D = GetComponent<Rigidbody2D>();
@@ -20,10 +22,12 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
        // 점프한다.
-       if (Input.GetKeyDown(KeyCode.Space) && this.rigid2D.velocity.y == 0)
+       if (Input.GetKeyDown(KeyCode.Space) && jumpCount < 2)
         {
             this.animator.SetTrigger("JumpTrigger");
             this.rigid2D.AddForce(transform.up * this.jumpForce);
+
+            jumpCount++;
         }
 
         // 좌우 이동
@@ -66,7 +70,18 @@ public class PlayerController : MonoBehaviour
     // 골 도착
     void OnTriggerEnter2D(Collider2D collision)
     {
+        // 게임 클리어
         Debug.Log("골");
         SceneManager.LoadScene("ClearScene");
+    }
+
+    // 바닥에 닿았을 때
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        // 점프 횟수 초기화
+        if (this.rigid2D.velocity.y == 0)
+        {
+            jumpCount = 0;
+        }
     }
 }
